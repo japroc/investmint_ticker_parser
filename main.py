@@ -118,8 +118,11 @@ class Date:
 
     @property
     def timestamp(self):
-        d = datetime.date(self.year, self.month, self.day)
-        return calendar.timegm(d.timetuple())
+        return calendar.timegm(self.date.timetuple())
+
+    @property
+    def date(self):
+        return datetime.date(self.year, self.month, self.day)
 
     def json(self):
         return {
@@ -172,6 +175,22 @@ class TickerInfo:
         self.future_divs = None
         self.previous_divs = None
 
+    def eval_div_period(self, d2, d1):
+        if not d2 or not d1:
+            return None
+
+        td = d2 - d1
+        td_days = td.days
+
+        if td_days > 60 and td_days < 120:
+            return 3
+        elif td_days > 150 and td_days < 210:
+            return 6
+        elif td_days > 330 and td_days < 390:
+            return 12
+        else:
+            return None
+
     def json(self):
         buy_till_date = self.buy_till_date.json() if isinstance(self.buy_till_date, Date) else self.buy_till_date
         ex_div_date = self.ex_div_date.json() if isinstance(self.ex_div_date, Date) else self.ex_div_date
@@ -179,6 +198,14 @@ class TickerInfo:
         div_pay_date = self.div_pay_date.json() if isinstance(self.div_pay_date, Date) else self.div_pay_date
         future_divs = list(map(lambda x: x.json(), self.future_divs))
         previous_divs = list(map(lambda x: x.json(), self.previous_divs))
+        future_div = future_divs[-1] if future_divs else None
+        previous_div = previous_divs[0] if previous_divs else None,
+        if self.future_divs and self.previous_divs:
+            next_date = self.future_divs[-1].registry_close_date.date
+            prev_date = self.previous_divs[0].registry_close_date.date
+            div_period = self.eval_div_period(next_date, prev_date)
+        else:
+            div_period = None
         return {
             "price": self.price,
             "dividend": self.dividend,
@@ -189,8 +216,9 @@ class TickerInfo:
             "div_pay_date": div_pay_date,
             "future_divs": future_divs,
             "previous_divs": previous_divs,
-            "future_div": future_divs[-1] if future_divs else None,
-            "previous_div": previous_divs[0] if previous_divs else None,
+            "future_div": future_div,
+            "previous_div": previous_div,
+            "div_period": div_period,
         }
 
     # def __repr__(self):
