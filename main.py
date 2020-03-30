@@ -182,11 +182,11 @@ class TickerInfo:
         td = d2 - d1
         td_days = td.days
 
-        if td_days > 60 and td_days < 120:
+        if td_days > 50 and td_days < 130:
             return 3
-        elif td_days > 150 and td_days < 210:
+        elif td_days > 150 and td_days < 220:
             return 6
-        elif td_days > 330 and td_days < 390:
+        elif td_days > 300 and td_days < 410:
             return 12
         else:
             return None
