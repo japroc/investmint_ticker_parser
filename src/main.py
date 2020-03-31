@@ -6,11 +6,27 @@ import traceback
 from flask import Flask
 from flask import jsonify
 
+from modules.investing_stock import get_ticker_info
 from modules.investmint import parse_ticker
 from modules.smartlab_bonds import parse_coupon_by_isin
 
 
 app = Flask(__name__)
+
+
+@app.route('/investing/<ticker>')
+def get_investing_ticker(ticker):
+    try:
+        ticker_info = get_ticker_info(ticker)
+        if ticker_info:
+            resp = {"success": True, "result": ticker_info}
+        else:
+            resp = {"success": False, "error": "Ticker Not Found"}
+    except Exception as e:
+        traceback.print_exc()
+        resp = {"success": False, "error": "{}".format(e)}
+    finally:
+        return jsonify(resp)
 
 
 @app.route('/investmint/<ticker>')
