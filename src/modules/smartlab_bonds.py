@@ -155,4 +155,4 @@ def parse_coupon_by_isin(isin):
         ))
     bond_info.all_coupons = all_coupons
 
-    return bond_info
+    return bond_info.json()
