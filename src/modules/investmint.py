@@ -1,8 +1,6 @@
-#!/usr/bin/python3
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from flask import Flask
-from flask import jsonify
 import calendar
 import datetime
 import json
@@ -312,28 +310,3 @@ def parse_ticker(ticker):
     ticket_info.future_divs, ticket_info.previous_divs = parse_divs_table(divs_table)
 
     return ticket_info.json()
-
-app = Flask(__name__)
-
-@app.route('/investmint/<ticker>')
-def parse_investmint_ticker(ticker):
-    print(ticker)
-    try:
-        ticker_info = parse_ticker(ticker)
-        if ticker_info:
-            resp = {"success": True, "result": ticker_info}
-        else:
-            resp = {"success": False, "error": "Ticker Not Found"}
-    except Exception as e:
-        traceback.print_exc()
-        resp = {"success": False, "error": "{}".format(e)}
-    finally:
-        return jsonify(resp)
-
-
-@app.route('/ping')
-def ping():
-    return "pong"
-
-if __name__ == '__main__':
-    app.run(host="0.0.0.0", port=8000)
