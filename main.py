@@ -10,18 +10,25 @@ import re
 import requests
 import traceback
 
+class Currency:
+    RUB = "RUB"
+    USD = "USD"
+
 def parse_float(value):
-    return float(value.replace(",", ".").replace("\xa0", ""))
+    val = value.strip().replace(",", ".").replace("\xa0", "")
+    return float(val) if val else None
 
 def parse_currency(currency_):
+    if not currency_:
+        return None
     currency = currency_.strip()
     currencies = {
-        "₽": "RUB",
-        "$": "USD",
+        "₽": Currency.RUB,
+        "$": Currency.USD,
     }
     currency_ords = {
-        8381: "RUB",
-        36: "USD",
+        8381: Currency.RUB,
+        36: Currency.USD,
     }
     res = currencies.get(currency)
     if not res:
@@ -166,7 +173,10 @@ class DivInfo:
 class TickerInfo:
     def __init__(self):
         self.name = None
+        self.sector = None
+        self.isin = None
         self.price = None
+        self.currency = None
         self.dividend = None
         self.div_yield = None
         self.buy_till_date = None
@@ -200,16 +210,34 @@ class TickerInfo:
         future_divs = list(map(lambda x: x.json(), self.future_divs))
         previous_divs = list(map(lambda x: x.json(), self.previous_divs))
         future_div = future_divs[-1] if future_divs else None
-        previous_div = previous_divs[0] if previous_divs else None,
+        previous_div = previous_divs[0] if previous_divs else None
         if self.future_divs and self.previous_divs:
             next_date = self.future_divs[-1].registry_close_date.date
             prev_date = self.previous_divs[0].registry_close_date.date
             div_period = self.eval_div_period(next_date, prev_date)
+        elif len(self.previous_divs) >= 2:
+            date1 = self.previous_divs[0].registry_close_date.date
+            date2 = self.previous_divs[1].registry_close_date.date
+            div_period = self.eval_div_period(date1, date2)
         else:
             div_period = None
+
+        if self.currency:
+            currency = self.currency
+        elif self.future_divs:
+            currency = self.future_divs[-1].currency
+        elif self.previous_divs:
+            currency = self.previous_divs[0].currency
+        elif self.isin.startswith("RU"):
+            currency = Currency.RUB
+        else:
+            currency = Currency.USD
         return {
             "name": self.name,
+            "sector": self.sector,
+            "isin": self.isin,
             "price": self.price,
+            "currency": currency,
             "dividend": self.dividend,
             "div_yield": self.div_yield,
             "buy_till_date": buy_till_date,
@@ -240,9 +268,18 @@ def parse_ticker(ticker):
     if m:
         ticket_info.name = m.group(1)
 
-    m = re.search(r"""<div class="smallcaps">Курс акций</div><div class="d-flex align-items-center text-nowrap"><div class="num200 mr-2">(.*?)&""", text)
+    m = re.search(r"""<div class="smallcaps">Сектор</div><p>(.*?)</p>""", text)
+    if m:
+        ticket_info.sector = m.group(1)
+
+    m = re.search(r"""<div class="smallcaps">ISIN</div><p>(.*?)</p>""", text)
+    if m:
+        ticket_info.isin = m.group(1)
+
+    m = re.search(r"""<div class="smallcaps">Курс акций</div><div class="d-flex align-items-center text-nowrap"><div class="num200 mr-2">([0-9,]*?)(?:</div>|&nbsp;<small class="text-muted">(.*?)</small></div>)""", text)
     if m:
         ticket_info.price = parse_float(m.group(1))
+        ticket_info.currency = parse_currency(m.group(2))
 
     m = re.search(r"""><div class="smallcaps mb-1">Дивиденд</div><div class="d-flex align-items-center"><div class="num200">([\d,]*)""", text)
     if m:
