@@ -165,6 +165,7 @@ class DivInfo:
 
 class TickerInfo:
     def __init__(self):
+        self.name = None
         self.price = None
         self.dividend = None
         self.div_yield = None
@@ -207,6 +208,7 @@ class TickerInfo:
         else:
             div_period = None
         return {
+            "name": self.name,
             "price": self.price,
             "dividend": self.dividend,
             "div_yield": self.div_yield,
@@ -226,13 +228,17 @@ class TickerInfo:
 
 
 def parse_ticker(ticker):
-    r = requests.get("https://investmint.ru/{}/".format(ticker))
+    r = requests.get("https://investmint.ru/{}/".format(ticker.lower()))
     text = r.text
 
     if r.status_code != 200:
         return None
 
     ticket_info = TickerInfo()
+
+    m = re.search(r"""<h2 class="mb-1">Утверждённые ближайшие дивиденды на одну акцию (.*?) сегодня</h2>""", text)
+    if m:
+        ticket_info.name = m.group(1)
 
     m = re.search(r"""<div class="smallcaps">Курс акций</div><div class="d-flex align-items-center text-nowrap"><div class="num200 mr-2">(.*?)&""", text)
     if m:
