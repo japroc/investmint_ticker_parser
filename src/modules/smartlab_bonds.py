@@ -151,7 +151,7 @@ def parse_coupon_by_isin(isin):
         all_coupons.append(Coupon(
             date=Date(int(coupon_parts[0]), int(coupon_parts[1]), int(coupon_parts[2])),
             coupon=float(coupon_parts[3]),
-            coupon_year_yield=float(coupon_parts[4])
+            coupon_yield=float(coupon_parts[4])
         ))
     bond_info.all_coupons = all_coupons
 

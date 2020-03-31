@@ -6,11 +6,12 @@ import datetime
 import json
 import re
 import requests
-import traceback
+
 
 class Currency:
     RUB = "RUB"
     USD = "USD"
+
 
 def parse_float(value):
     val = value.strip().replace(",", ".").replace("\xa0", "")

@@ -1,12 +1,17 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+import traceback
+
 from flask import Flask
 from flask import jsonify
+
 from modules.investmint import parse_ticker
 from modules.smartlab_bonds import parse_coupon_by_isin
 
+
 app = Flask(__name__)
+
 
 @app.route('/investmint/<ticker>')
 def parse_investmint_ticker(ticker):
