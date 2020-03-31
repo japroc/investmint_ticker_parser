@@ -73,6 +73,7 @@ class TickerInfo:
         self.industry = None
         self.sector = None
         self.currency = None
+        self.pe = None
         self.all_divs = list()
 
     def eval_div_period(self, d2, d1):
@@ -105,6 +106,7 @@ class TickerInfo:
             "industry": self.industry,
             "sector": self.sector,
             "currency": self.currency,
+            "pe": self.pe,
             "all_divs": all_divs,
             "div_period": div_period,
         }
@@ -173,6 +175,13 @@ def get_ticker_info(ticker_):
     m = re.search(r"""Currency in <span class='bold'>(.*?)</span>""", text)
     if m:
         ticker_info.currency = m.group(1).strip()
+
+    m = re.search(r"""class="float_lang_base_1">P/E Ratio</span><span class="float_lang_base_2 bold">(.*?)</span""", text)
+    if m:
+        if m.group(1) == "N/A":
+            ticker_info.pe = None
+        else:
+            ticker_info.pe = float(m.group(1))
 
     m = re.search(r"""<li><a href="(.*?)" class="arial_12 bold">Dividends</a></li>""", text)
     dividend_link = "https://uk.investing.com{}".format(m.group(1))
