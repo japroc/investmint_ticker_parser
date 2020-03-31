@@ -52,7 +52,6 @@ class DivInfo:
     def __init__(self):
         self.ex_div_date = None
         self.dividend = None
-        self.div_period = None
         self.pay_date = None
         self.div_yield = None
 
@@ -61,7 +60,6 @@ class DivInfo:
         pay_date = self.pay_date.json() if isinstance(self.pay_date, Date) else self.pay_date
         return {
             "dividend": self.dividend,
-            "div_period": self.div_period,
             "div_yield": self.div_yield,
             "ex_div_date": ex_div_date,
             "pay_date": pay_date,
