@@ -31,16 +31,16 @@ class Date:
 
 
 class Coupon:
-    def __init__(self, date, coupon, coupon_year_yield):
+    def __init__(self, date, coupon, coupon_yield):
         self.date = date
         self.coupon = coupon
-        self.coupon_year_yield = coupon_year_yield
+        self.coupon_yield = coupon_yield
 
     def json(self):
         return {
             "date": self.date.json(),
             "coupon": self.coupon,
-            "coupon_year_yield": self.coupon_year_yield,
+            "coupon_yield": self.coupon_yield,
         }
 
 
