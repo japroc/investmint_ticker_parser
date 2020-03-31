@@ -120,7 +120,7 @@ def get_ticker_info(ticker_):
         "Content-Type": "application/x-www-form-urlencoded",
         "Accept": "application/json, text/javascript, */*; q=0.01",
         "X-Requested-With": "XMLHttpRequest",
-        "Connection": "Close",
+        "Connection": "close",
     }
     url = "https://uk.investing.com/search/service/searchTopBar"
 
