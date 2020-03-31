@@ -51,6 +51,7 @@ class BondInfo:
         self.publish_date = None
         self.close_date = None
         self.nominal = None
+        self.currency = None
         self.coupon_yield = None
         self.next_coupon = None
         self.nkd = None
@@ -75,6 +76,7 @@ class BondInfo:
             "name": self.name,
             "isin": self.isin,
             "nominal": self.nominal,
+            "currency": self.currency,
             "coupon_yield": self.coupon_yield,
             "next_coupon": self.next_coupon,
             "nkd": self.nkd,
@@ -118,7 +120,7 @@ def parse_coupon_by_isin(isin):
 
     m = re.search(r"""<td><abbr title="Валюта номинала">Валюта</abbr></td>\s*?<td>(.*?)</td>""", text)
     if m:
-        bond_info.nominal = "RUB" if m.group(1) == "руб" else None
+        bond_info.currency = "RUB" if m.group(1) == "руб" else None
 
     m = re.search(r""">Дох\. купона, годовых от ном</abbr></td>\s*<td(?:\s+class="up")?>(.*?)%</td>""", text)
     if m:
@@ -140,7 +142,7 @@ def parse_coupon_by_isin(isin):
     if m:
         bond_info.status = m.group(1)
 
-    calendar_start_idx = text.find("""<h2 style="margin-top: 2em">Календарь выплаты купонов по облигации ФПК Гарант-Инвест БО 001P-05 (RU000A1005T9)</h2""")
+    calendar_start_idx = text.find("""<h2 style="margin-top: 2em">Календарь выплаты купонов по облигации""")
     all_couponds_table_start_idx = text.find("""<table class="simple-little-table bond" cellspacing="0">""", calendar_start_idx)
     all_couponds_table_stop_idx = text.find("""</table>""", all_couponds_table_start_idx)
     all_couponds_table = text[all_couponds_table_start_idx:all_couponds_table_stop_idx]
