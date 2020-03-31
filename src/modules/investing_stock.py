@@ -183,31 +183,33 @@ def get_ticker_info(ticker_):
         else:
             ticker_info.pe = float(m.group(1))
 
-    m = re.search(r"""<li><a href="(.*?)" class="arial_12 bold">Dividends</a></li>""", text)
-    dividend_link = "https://uk.investing.com{}".format(m.group(1))
-
-    r3 = requests.get(dividend_link, headers=headers, timeout=3)
-    text3 = r3.text
-
-    div_table_start_idx = text3.find("""<th class="first left">Ex-Dividend Date<span sort_default class="headerSortDefault"></span></th>""")
-    div_table_finish_idx = text3.find("""</table>""", div_table_start_idx)
-    div_table = text3[div_table_start_idx:div_table_finish_idx]
-
-    regex  = r"""<tr event_timestamp=".*?">.*?">([^\s]*) (\d*), (\d*)</td>\s*"""
-    regex += r"""<td>(.*?)</td>.*?"""
-    regex += r"""<td data-value=".*?">([^\s]*) (\d*), (\d*)</td>\s*"""
-    regex += r"""<td>(.*?)%</td>"""
-
-    all_divs_info = re.findall(regex, div_table, re.S)
-
     all_divs = list()
-    for div_info in all_divs_info:
-        di = DivInfo()
-        di.ex_div_date = parse_date(div_info[1], div_info[0], div_info[2])
-        di.dividend = float(div_info[3])
-        di.pay_date = parse_date(div_info[5], div_info[4], div_info[6])
-        di.div_yield = float(div_info[7])
-        all_divs.append(di)
+
+    m = re.search(r"""<li><a href="(.*?)" class="arial_12 bold">Dividends</a></li>""", text)
+    if m:
+        dividend_link = "https://uk.investing.com{}".format(m.group(1))
+
+        r3 = requests.get(dividend_link, headers=headers, timeout=3)
+        text3 = r3.text
+
+        div_table_start_idx = text3.find("""<th class="first left">Ex-Dividend Date<span sort_default class="headerSortDefault"></span></th>""")
+        div_table_finish_idx = text3.find("""</table>""", div_table_start_idx)
+        div_table = text3[div_table_start_idx:div_table_finish_idx]
+
+        regex  = r"""<tr event_timestamp=".*?">.*?">([^\s]*) (\d*), (\d*)</td>\s*"""
+        regex += r"""<td>(.*?)</td>.*?"""
+        regex += r"""<td data-value=".*?">([^\s]*) (\d*), (\d*)</td>\s*"""
+        regex += r"""<td>(.*?)%</td>"""
+
+        all_divs_info = re.findall(regex, div_table, re.S)
+
+        for div_info in all_divs_info:
+            di = DivInfo()
+            di.ex_div_date = parse_date(div_info[1], div_info[0], div_info[2])
+            di.dividend = float(div_info[3])
+            di.pay_date = parse_date(div_info[5], div_info[4], div_info[6])
+            di.div_yield = float(div_info[7])
+            all_divs.append(di)
 
     ticker_info.all_divs = all_divs
 
