@@ -124,7 +124,7 @@ def get_ticker_info(ticker_):
     url = "https://uk.investing.com/search/service/searchTopBar"
 
     data = "search_text={}".format(ticker.lower())
-    r = requests.post(url, data=data, headers=headers)
+    r = requests.post(url, data=data, headers=headers, timeout=10)
     json_data = r.json()
     quotes = json_data["quotes"]
     quotes = list(filter(lambda x:x.get("symbol") == ticker.upper(), quotes))
@@ -132,7 +132,7 @@ def get_ticker_info(ticker_):
     if not quotes and ticker_.endswith("p"):
         ticker = ticker[:-1]
         data = "search_text={}".format(ticker)
-        r = requests.post(url, data=data, headers=headers)
+        r = requests.post(url, data=data, headers=headers, timeout=10)
         json_data = r.json()
         quotes = json_data["quotes"]
         quotes = list(filter(lambda x:x.get("symbol") == ticker.upper() + "_p", quotes))
@@ -153,7 +153,7 @@ def get_ticker_info(ticker_):
 
     ticker_info = TickerInfo()
 
-    r2 = requests.get(link, headers=headers)
+    r2 = requests.get(link, headers=headers, timeout=10)
     text = r2.text
     m = re.search("""<input type="text" class="newInput inputTextBox alertValue" placeholder="([^"]*)""", text)
     if m:
@@ -178,7 +178,7 @@ def get_ticker_info(ticker_):
     m = re.search(r"""<li><a href="(.*?)" class="arial_12 bold">Dividends</a></li>""", text)
     dividend_link = "https://uk.investing.com{}".format(m.group(1))
 
-    r3 = requests.get(dividend_link, headers=headers)
+    r3 = requests.get(dividend_link, headers=headers, timeout=10)
     text3 = r3.text
 
     div_table_start_idx = text3.find("""<th class="first left">Ex-Dividend Date<span sort_default class="headerSortDefault"></span></th>""")
