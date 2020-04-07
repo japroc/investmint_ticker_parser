@@ -263,7 +263,8 @@ def parse_ticker(ticker):
 
     ticket_info = TickerInfo()
 
-    m = re.search(r"""<h2 class="mb-1">Утверждённые ближайшие дивиденды на одну акцию (.*?) сегодня</h2>""", text)
+    # m = re.search(r"""<h2 class="mb-1">Утверждённые ближайшие дивиденды на одну акцию (.*?) сегодня</h2>""", text)
+    m = re.search(r"""<div class="ml-3"><h1 class="mb-2">Дивиденды (.*?) \d{4}</h1>""", text)
     if m:
         ticket_info.name = m.group(1)
 
@@ -275,9 +276,9 @@ def parse_ticker(ticker):
     if m:
         ticket_info.isin = m.group(1)
 
-    m = re.search(r"""<div class="smallcaps">Курс акций</div><div class="d-flex align-items-center text-nowrap"><div class="num200 mr-2">([0-9,]*?)(?:</div>|&nbsp;<small class="text-muted">(.*?)</small></div>)""", text)
+    m = re.search(r"""<div class="smallcaps">Курс акций</div><div class="d-flex align-items-center text-nowrap"><div class="num200 mr-2">(.*?)(?:</div>|<small class="text-muted">(.*?)</small></div>)""", text)
     if m:
-        ticket_info.price = parse_float(m.group(1))
+        ticket_info.price = parse_float(m.group(1).replace("&nbsp;", "").replace("\\xa0", ""))
         ticket_info.currency = parse_currency(m.group(2))
 
     m = re.search(r"""><div class="smallcaps mb-1">Дивиденд</div><div class="d-flex align-items-center"><div class="num200">([\d,]*)""", text)
