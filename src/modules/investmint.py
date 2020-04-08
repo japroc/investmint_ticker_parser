@@ -227,7 +227,7 @@ class TickerInfo:
             currency = self.future_divs[-1].currency
         elif self.previous_divs:
             currency = self.previous_divs[0].currency
-        elif self.isin.startswith("RU"):
+        elif self.isin and self.isin.startswith("RU"):
             currency = Currency.RUB
         else:
             currency = Currency.USD
