@@ -14,7 +14,7 @@ class Currency:
 
 
 def parse_float(value):
-    val = value.strip().replace(",", ".").replace("\xa0", "")
+    val = value.strip().replace(",", ".").replace("&nbsp;", "").replace("\\xa0", "")
     return float(val) if val else None
 
 def parse_currency(currency_):
@@ -278,7 +278,7 @@ def parse_ticker(ticker):
 
     m = re.search(r"""<div class="smallcaps">Курс акций</div><div class="d-flex align-items-center text-nowrap"><div class="num200 mr-2">(.*?)(?:</div>|<small class="text-muted">(.*?)</small></div>)""", text)
     if m:
-        ticket_info.price = parse_float(m.group(1).replace("&nbsp;", "").replace("\\xa0", ""))
+        ticket_info.price = parse_float(m.group(1))
         ticket_info.currency = parse_currency(m.group(2))
 
     m = re.search(r"""><div class="smallcaps mb-1">Дивиденд</div><div class="d-flex align-items-center"><div class="num200">([\d,]*)""", text)
