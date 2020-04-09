@@ -14,7 +14,7 @@ class Currency:
 
 
 def parse_float(value):
-    val = value.strip().replace(",", ".").replace("&nbsp;", "").replace("\\xa0", "")
+    val = value.strip().replace(",", ".").replace("&nbsp;", "").replace("\\xa0", "").replace("\xa0", "")
     return float(val) if val else None
 
 def parse_currency(currency_):
