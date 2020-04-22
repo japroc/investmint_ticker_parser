@@ -181,7 +181,7 @@ def get_ticker_info(ticker_):
 
     m = re.search(r"""Next Earnings Date.*?>([^\s]*) (\d*), (\d*)</a>""", text)
     if m:
-        ticker_info.next_earnings_date = parse_date(m.group(1), m.group(0), m.group(2))
+        ticker_info.next_earnings_date = parse_date(m.group(2), m.group(1), m.group(3))
 
     m = re.search(r"""class="float_lang_base_1">P/E Ratio</span><span class="float_lang_base_2 bold">(.*?)</span""", text)
     if m:
