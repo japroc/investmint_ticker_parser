@@ -74,6 +74,7 @@ class TickerInfo:
         self.sector = None
         self.currency = None
         self.pe = None
+        self.next_earnings_date = None
         self.all_divs = list()
 
     def eval_div_period(self, d2, d1):
@@ -93,6 +94,7 @@ class TickerInfo:
             return None
 
     def json(self):
+        next_earnings_date = self.next_earnings_date.json() if isinstance(self.next_earnings_date, Date) else self.next_earnings_date
         all_divs = list(map(lambda x: x.json(), self.all_divs))
         if len(self.all_divs) >= 2:
             date1 = self.all_divs[0].ex_div_date.date
@@ -109,6 +111,7 @@ class TickerInfo:
             "pe": self.pe,
             "all_divs": all_divs,
             "div_period": div_period,
+            "next_earnings_date": next_earnings_date,
         }
 
 
@@ -175,6 +178,10 @@ def get_ticker_info(ticker_):
     m = re.search(r"""Currency in <span class='bold'>(.*?)</span>""", text)
     if m:
         ticker_info.currency = m.group(1).strip()
+
+    m = re.search(r"""Next Earnings Date.*?>([^\s]*) (\d*), (\d*)</a>""", text)
+    if m:
+        ticker_info.next_earnings_date = parse_date(m.group(1), m.group(0), m.group(2))
 
     m = re.search(r"""class="float_lang_base_1">P/E Ratio</span><span class="float_lang_base_2 bold">(.*?)</span""", text)
     if m:
