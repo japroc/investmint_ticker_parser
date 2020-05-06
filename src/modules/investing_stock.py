@@ -116,7 +116,7 @@ class TickerInfo:
 
 
 def get_ticker_info(ticker_):
-    ticker = ticker_.lower()
+    ticker = ticker_.lower().replace(".", "")
     user_agent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:66.0) Gecko/20100101 Firefox/66.0"
     headers = {
         "User-Agent": user_agent, 
@@ -131,7 +131,7 @@ def get_ticker_info(ticker_):
     r = requests.post(url, data=data, headers=headers, timeout=3)
     json_data = r.json()
     quotes = json_data["quotes"]
-    quotes = list(filter(lambda x:x.get("symbol") == ticker.upper(), quotes))
+    quotes = list(filter(lambda x:x.get("symbol").upper() == ticker.upper(), quotes))
 
     if not quotes and ticker_.endswith("p"):
         ticker = ticker[:-1]
@@ -139,7 +139,7 @@ def get_ticker_info(ticker_):
         r = requests.post(url, data=data, headers=headers, timeout=3)
         json_data = r.json()
         quotes = json_data["quotes"]
-        quotes = list(filter(lambda x:x.get("symbol") == ticker.upper() + "_p", quotes))
+        quotes = list(filter(lambda x:x.get("symbol").upper() == ticker.upper() + "_p", quotes))
 
     if not quotes:
         return None
