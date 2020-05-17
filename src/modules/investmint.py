@@ -6,6 +6,7 @@ import datetime
 import json
 import re
 import requests
+import html
 
 
 class Currency:
@@ -266,7 +267,7 @@ def parse_ticker(ticker):
     # m = re.search(r"""<h2 class="mb-1">Утверждённые ближайшие дивиденды на одну акцию (.*?) сегодня</h2>""", text)
     m = re.search(r"""<div class="ml-3"><h1 class="mb-2">Дивиденды (.*?) \d{4}</h1>""", text)
     if m:
-        ticket_info.name = m.group(1)
+        ticket_info.name = html.unescape(m.group(1))
 
     m = re.search(r"""<div class="smallcaps">Сектор</div><p>(.*?)</p>""", text)
     if m:
