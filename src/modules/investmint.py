@@ -71,12 +71,14 @@ def parse_month(month):
     }
     return monthes.get(month)
 
+
+
 def parse_divs_table(divs_table):
     future_divs = list()
     previous_divs = list()
 
-    future_divs_regex = re.compile(r"""<tr class="(.*?)">.*?<td class="text-nowrap">(.*?)<.*?>(.*?)</span></td><td class="text-nowrap">(.*?)<span.*?>(.*?)</span></td><td class="text-nowrap text-right">(.*?)(?:&nbsp;)?<small class="text-muted">(.*?)</small></td><td class="text-right">(.*?)<small class="text-muted">%</small></td><td></td></tr>""")
-    previous_divs_regex = re.compile(r"""<tr class="(.*?)">.*?<td class="text-nowrap">(.*?)<.*?>(.*?)</span></td><td class="text-nowrap">(.*?)<span.*?>(.*?)</span></td><td class="text-nowrap text-right">(.*?)(?:&nbsp;)?<small class="text-muted">(.*?)</small></td><td class="text-right">(.*?)<small class="text-muted">%</small></td><td class="text-right">(.*?)(?:&nbsp;)?<""")
+    future_divs_regex   = re.compile(r"""<tr class="(.*?)"><td class="text-nowrap text-center">.+?</td><td class="text-nowrap">(.*?) (\d+)</td><td class="text-nowrap">(.*?) (\d+)</td><td class="text-nowrap text-right">([\d,]+)&nbsp;<small class="text-muted">(.*?)</small></td><td class="text-right">([\d,]+)<small class="text-muted">%</small></td><td></td></tr>""")
+    previous_divs_regex = re.compile(r"""<tr class="(.*?)"><td class="text-nowrap text-center"></td><td class="text-nowrap">(.*?) (\d+)</td><td class="text-nowrap">(.*?) (\d+)</td><td class="text-nowrap text-right">([\d,]+).*?<small class="text-muted">(.*?)</small></td><td class="text-right">([\d,]+).*?<small class="text-muted">%</small></td><td class="text-right">([\d,]+).*?<small class="text-muted">""")
 
     lookup_for_future_divs = True
 
@@ -116,6 +118,53 @@ def parse_divs_table(divs_table):
         prev_line_start_idx = line_start_idx
 
     return future_divs, previous_divs
+
+
+# def parse_divs_table_v1(divs_table):
+#     future_divs = list()
+#     previous_divs = list()
+
+#     future_divs_regex   = re.compile(r"""<tr class="(.*?)">.*?<td class="text-nowrap">(.*?)<.*?>(.*?)</span></td><td class="text-nowrap">(.*?)<span.*?>(.*?)</span></td><td class="text-nowrap text-right">(.*?)(?:&nbsp;)?<small class="text-muted">(.*?)</small></td><td class="text-right">(.*?)<small class="text-muted">%</small></td><td></td></tr>""")
+#     previous_divs_regex = re.compile(r"""<tr class="(.*?)">.*?<td class="text-nowrap">(.*?)<.*?>(.*?)</span></td><td class="text-nowrap">(.*?)<span.*?>(.*?)</span></td><td class="text-nowrap text-right">(.*?)(?:&nbsp;)?<small class="text-muted">(.*?)</small></td><td class="text-right">(.*?)<small class="text-muted">%</small></td><td class="text-right">(.*?)(?:&nbsp;)?<""")
+
+#     lookup_for_future_divs = True
+
+#     prev_line_start_idx = divs_table.find("<tr")
+#     while True:
+#         line_start_idx = divs_table.find("<tr", prev_line_start_idx+1)
+#         if line_start_idx == -1:
+#             break
+
+#         line_end_idx = divs_table.find("</tr>", line_start_idx)
+#         line = divs_table[line_start_idx:line_end_idx+5]
+
+#         if lookup_for_future_divs:
+#             m = re.search(future_divs_regex, line)
+#             if not m:
+#                 lookup_for_future_divs = False
+
+#         if not lookup_for_future_divs:
+#             m = re.search(previous_divs_regex, line)
+#             if not m:
+#                 break
+
+#         div_info = DivInfo()
+#         div_info.verified = "green-bg" in m.group(1) or "gray-bg" not in m.group(1)
+#         div_info.buy_till_date = parse_date(m.group(2), m.group(3))
+#         div_info.registry_close_date = parse_date(m.group(4), m.group(5))
+#         div_info.dividend = parse_float(m.group(6))
+#         div_info.currency = parse_currency(m.group(7))
+#         div_info.div_yield = parse_float(m.group(8))
+
+#         if lookup_for_future_divs:
+#             future_divs.append(div_info)
+#         else:
+#             div_info.close_price = parse_float(m.group(9))
+#             previous_divs.append(div_info)
+
+#         prev_line_start_idx = line_start_idx
+
+#     return future_divs, previous_divs
 
 class Date:
     def __init__(self, day=None, month=None, year=None):
