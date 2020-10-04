@@ -77,8 +77,8 @@ def parse_divs_table(divs_table):
     future_divs = list()
     previous_divs = list()
 
-    future_divs_regex   = re.compile(r"""<tr class="(.*?)"><td class="text-nowrap text-center">.+?</td><td class="text-nowrap">(.*?) (\d+)</td><td class="text-nowrap">(.*?) (\d+)</td><td class="text-nowrap text-right">([\d,]+)&nbsp;<small class="text-muted">(.*?)</small></td><td class="text-right">([\d,]+)<small class="text-muted">%</small></td><td></td></tr>""")
-    previous_divs_regex = re.compile(r"""<tr class="(.*?)"><td class="text-nowrap text-center"></td><td class="text-nowrap">(.*?) (\d+)</td><td class="text-nowrap">(.*?) (\d+)</td><td class="text-nowrap text-right">([\d,]+).*?<small class="text-muted">(.*?)</small></td><td class="text-right">([\d,]+).*?<small class="text-muted">%</small></td><td class="text-right">([\d,]+).*?<small class="text-muted">""")
+    future_divs_regex   = re.compile(r"""<tr class="(.*?)">\s?<td class="text-nowrap text-center">.+?</td>\s?<td class="text-nowrap">(.*?) (\d+)</td>\s?<td class="text-nowrap">(.*?) (\d+)</td>\s?<td class="text-nowrap text-right">([\d,]+)&nbsp;<small class="text-muted">(.*?)</small></td>\s?<td class="text-right">([\d,]+)<small class="text-muted">%</small></td>\s?<td>\s?</td>\s?</tr>""")
+    previous_divs_regex = re.compile(r"""<tr class="(.*?)">\s?<td class="text-nowrap text-center">\s?</td>\s?<td class="text-nowrap">(.*?) (\d+)</td>\s?<td class="text-nowrap">(.*?) (\d+)</td>\s?<td class="text-nowrap text-right">([\d,]+).*?<small class="text-muted">(.*?)</small></td>\s?<td class="text-right">([\d,]+).*?<small class="text-muted">%</small></td>\s?<td class="text-right">([\d,]+).*?<small class="text-muted">""")
 
     lookup_for_future_divs = True
 
@@ -313,29 +313,29 @@ def parse_ticker(ticker):
 
     ticket_info = TickerInfo()
 
-    # m = re.search(r"""<h2 class="mb-1">Утверждённые ближайшие дивиденды на одну акцию (.*?) сегодня</h2>""", text)
-    m = re.search(r"""<div class="ml-3"><h1 class="mb-2">Дивиденды (.*?) \d{4}</h1>""", text)
+    m = re.search(r"""<div class="ml-3">\s?<h1 class="mb-2">Дивиденды (.*?) \d{4}</h1>""", text)
     if m:
         ticket_info.name = html.unescape(m.group(1))
 
-    m = re.search(r"""<div class="smallcaps">Сектор</div><p>(.*?)</p>""", text)
+    m = re.search(r"""<div class="smallcaps">Сектор</div>\s?<p>(.*?)</p>""", text)
     if m:
         ticket_info.sector = m.group(1)
 
-    m = re.search(r"""<div class="smallcaps">ISIN</div><p>(.*?)</p>""", text)
+    m = re.search(r"""<div class="smallcaps">ISIN</div>\s?<p>(.*?)</p>""", text)
     if m:
         ticket_info.isin = m.group(1)
 
-    m = re.search(r"""<div class="smallcaps">Курс акций</div><div class="d-flex align-items-center text-nowrap"><div class="num200 mr-2">(.*?)(?:</div>|<small class="text-muted">(.*?)</small></div>)""", text)
+    m = re.search(r"""<div class="smallcaps">Курс акций</div>\s?<div class="d-flex align-items-center text-nowrap">\s?<div class="num\d* mr-2">(.*?)(?:</div>|<small class="text-muted">(.*?)</small></div>)""", text)
     if m:
         ticket_info.price = parse_float(m.group(1))
         ticket_info.currency = parse_currency(m.group(2))
 
-    m = re.search(r"""><div class="smallcaps mb-1">Дивиденд</div><div class="d-flex align-items-center"><div class="num200">([\d,]*)""", text)
+    m = re.search(r""">\s?<div class="smallcaps mb-1">Дивиденд</div>\s?<div class="d-flex align-items-center">\s?<div class="num\d*">([\d,]*)""", text)
+    m = re.search(r""">\s?<div class="smallcaps mb-1">Дивиденд</div>\s?""", text)
     if m:
         ticket_info.dividend = parse_float(m.group(1))
 
-    m = re.search(r"""<div class="smallcaps">Доходность</div><div class="num200">(.*?)<small class="text-muted">%</small""", text)
+    m = re.search(r"""<div class="smallcaps">Доходность</div>\s?<div class="num\d*">(.*?)<small class="text-muted">%</small""", text)
     if m:
         ticket_info.div_yield = parse_float(m.group(1))
 
